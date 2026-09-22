@@ -1,5 +1,5 @@
 USERNAME ?= jmondela
-COMPOSE_FILE = src/docker-compose.yml
+COMPOSE_FILE = srcs/docker-compose.yml
 DB_DOCKER_VOLUME = mariadb
 WP_DOCKER_VOLUME = wordpress
 DB_VOLUME = ${HOME}/data/jmondela/${DB_DOCKER_VOLUME}
@@ -26,8 +26,8 @@ clean: down
 
 fclean: clean
 	sudo rm -rf $(DB_VOLUME) $(WP_VOLUME)
-	docker volume rm src_$(DB_DOCKER_VOLUME) src_$(WP_DOCKER_VOLUME) --force
-	docker image rm src_$(DB_DOCKER_VOLUME) debian:bookworm-slim src_$(WP_DOCKER_VOLUME) srcs_nginx --force
+	docker volume rm srcs_$(DB_DOCKER_VOLUME) srcs_$(WP_DOCKER_VOLUME) --force
+	docker image rm srcs_$(DB_DOCKER_VOLUME) debian:bookworm-slim srcs_$(WP_DOCKER_VOLUME) srcss_nginx --force
 
 re: fclean all
 

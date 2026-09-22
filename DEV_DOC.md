@@ -6,13 +6,13 @@ commands, and how data persistence is wired up.
 
 ## 1. Project structure
 
-The `Makefile` points at `src/docker-compose.yml`, so the compose file and
-everything it references (build contexts, `.env`) live under a `src/` subfolder:
+The `Makefile` points at `srcs/docker-compose.yml`, so the compose file and
+everything it references (build contexts, `.env`) live under a `srcs/` subfolder:
 
 ```
 .
 ├── Makefile
-└── src/
+└── srcs/
     ├── docker-compose.yml
     ├── .env
     ├── data/
@@ -38,10 +38,10 @@ are no pre-built DB/CMS/webserver images used, everything is built from the
 `Dockerfile`s under `requirements/`.
 
 > **Check this against your actual folder name.** The `Makefile`'s `fclean` target
-> refers to images/volumes as `srcs_mariadb`, `srcs_wordpress`, `srcs_nginx` (with an
-> "s"), while `COMPOSE_FILE` points at `src/docker-compose.yml` (no "s"). Docker
+> refers to images/volumes as `srcss_mariadb`, `srcss_wordpress`, `srcss_nginx` (with an
+> "s"), while `COMPOSE_FILE` points at `srcs/docker-compose.yml` (no "s"). Docker
 > Compose names images/volumes after the directory the compose file lives in, so
-> these two need to agree with your real folder name (`src/` or `srcs/`) or `up`/
+> these two need to agree with your real folder name (`srcs/` or `srcss/`) or `up`/
 > `fclean` will be looking in different places.
 
 > Note: the bind mount path is `./data/jmondela/ngnix/logs` (typo for "nginx" carried over
@@ -68,7 +68,7 @@ are no pre-built DB/CMS/webserver images used, everything is built from the
 1. **Clone the repository** and `cd` into it (the directory containing the
    `Makefile`).
 
-2. **Create the `.env` file** inside `src/` (next to `docker-compose.yml`, since
+2. **Create the `.env` file** inside `srcs/` (next to `docker-compose.yml`, since
    `env_file: .env` in the compose file resolves relative to that file's location).
    It's read by every service and must define at least:
 
@@ -108,11 +108,11 @@ are no pre-built DB/CMS/webserver images used, everything is built from the
    ```
 
    This runs, in order:
-   - `create-volumes` — creates `${HOME}/data/jmondela/mariadb` and `src/data/jmondela/wordpress` on
+   - `create-volumes` — creates `${HOME}/data/jmondela/mariadb` and `srcs/data/jmondela/wordpress` on
      the host so bind mounts have somewhere to land.
    - `update-hosts` — adds `127.0.0.1  <USERNAME>.42.fr` to `/etc/hosts` if it isn't
      already there (prompts for `sudo`).
-   - `docker-compose -f src/docker-compose.yml up --build -d` — builds all three
+   - `docker-compose -f srcs/docker-compose.yml up --build -d` — builds all three
      images and starts the stack in the background.
 
    No manual `mkdir` or `/etc/hosts` editing is needed — that's the point of `up`'s
@@ -130,20 +130,20 @@ calling `docker-compose` by hand for anything routine:
 | Target | What it does |
 |---|---|
 | `make` / `make all` | Alias for `up`. |
-| `make up` | `create-volumes` + `update-hosts`, then `docker-compose -f src/docker-compose.yml up --build -d`. Builds and starts everything, creating host directories and the `/etc/hosts` entry first. |
-| `make down` | `docker-compose -f src/docker-compose.yml down --remove-orphans`. Stops and removes containers + network (also cleans up any orphaned containers from renamed/removed services). |
+| `make up` | `create-volumes` + `update-hosts`, then `docker-compose -f srcs/docker-compose.yml up --build -d`. Builds and starts everything, creating host directories and the `/etc/hosts` entry first. |
+| `make down` | `docker-compose -f srcs/docker-compose.yml down --remove-orphans`. Stops and removes containers + network (also cleans up any orphaned containers from renamed/removed services). |
 | `make stop` | `docker-compose ... stop`. Stops containers without removing them. |
 | `make logs` | `docker-compose ... logs`. One-shot log dump for all services (not `-f`/follow — see the raw command below if you want to tail). |
 | `make clean` | Runs `down`, then `docker container prune --force` (removes any other stopped containers on the host, not just this project's). |
 | `make fclean` | Runs `clean`, then **destroys persisted data**: `sudo rm -rf` on the MariaDB and WordPress host directories, `docker volume rm` on the named volumes, and `docker image rm` on all three built images plus the shared `debian:bookworm-slim` base. Use this for a genuinely clean slate. |
 | `make re` | `fclean` followed by `all` — full rebuild from nothing. |
-| `make create-volumes` | (internal, called by `up`) creates `${HOME}/data/jmondela/mariadb` and `src/data/jmondela/wordpress` on the host. |
+| `make create-volumes` | (internal, called by `up`) creates `${HOME}/data/jmondela/mariadb` and `srcs/data/jmondela/wordpress` on the host. |
 | `make update-hosts` | (internal, called by `up`) appends `127.0.0.1  <USERNAME>.42.fr` to `/etc/hosts` if missing. |
 
 `USERNAME` can be overridden on any invocation, e.g. `make up USERNAME=jdoe`.
 
 `make fclean` / `make re` are destructive to your WordPress content and database —
-see the caveat in §1 about the `src`/`srcs` and volume-naming mismatch before relying
+see the caveat in §1 about the `srcs`/`srcss` and volume-naming mismatch before relying
 on `fclean` in a script or CI, since a failing `docker volume rm` will abort the
 target partway through (containers/images already removed, but the `sudo rm -rf`
 line before it will still have run).
@@ -156,28 +156,28 @@ from the project root and referencing the compose file explicitly, matching what
 `Makefile` does:
 
 ```bash
-docker-compose -f src/docker-compose.yml <command>
+docker-compose -f srcs/docker-compose.yml <command>
 ```
 
 **Build/rebuild images** (needed after editing any `Dockerfile`, `conf/*`, or
 `tools/script.sh`):
 ```bash
-docker-compose -f src/docker-compose.yml build              # all services
-docker-compose -f src/docker-compose.yml build wordpress    # single service
+docker-compose -f srcs/docker-compose.yml build              # all services
+docker-compose -f srcs/docker-compose.yml build wordpress    # single service
 ```
 
 **Start / stop:**
 ```bash
-docker-compose -f src/docker-compose.yml up -d              # start (no rebuild)
-docker-compose -f src/docker-compose.yml up --build -d      # force rebuild before starting — same as `make up`
-docker-compose -f src/docker-compose.yml stop               # stop containers, keep them — same as `make stop`
-docker-compose -f src/docker-compose.yml down --remove-orphans   # same as `make down`
+docker-compose -f srcs/docker-compose.yml up -d              # start (no rebuild)
+docker-compose -f srcs/docker-compose.yml up --build -d      # force rebuild before starting — same as `make up`
+docker-compose -f srcs/docker-compose.yml stop               # stop containers, keep them — same as `make stop`
+docker-compose -f srcs/docker-compose.yml down --remove-orphans   # same as `make down`
 ```
 
 **Inspect running state:**
 ```bash
-docker-compose -f src/docker-compose.yml ps
-docker-compose -f src/docker-compose.yml logs -f [service]   # -f to follow, unlike `make logs`
+docker-compose -f srcs/docker-compose.yml ps
+docker-compose -f srcs/docker-compose.yml logs -f [service]   # -f to follow, unlike `make logs`
 ```
 
 **Shell into a running container:**
@@ -190,14 +190,14 @@ docker exec -it nginx sh
 **Restart a single service after a config-only change** (e.g. edited `nginx.conf`
 and rebuilt the image):
 ```bash
-docker-compose -f src/docker-compose.yml up -d --no-deps --build nginx
+docker-compose -f srcs/docker-compose.yml up -d --no-deps --build nginx
 ```
 
 **Full teardown including volumes** (drops the database — bind-mounted `./data/jmondela/...`
 content is untouched unless you delete it yourself, which is what `make fclean`'s
 `sudo rm -rf` step is for):
 ```bash
-docker-compose -f src/docker-compose.yml down -v
+docker-compose -f srcs/docker-compose.yml down -v
 ```
 
 ## 6. Data persistence
@@ -208,13 +208,13 @@ Persistence is split between a named Docker volume and host bind mounts, declare
 | Path in container | Type | Host location | Contains |
 |---|---|---|---|
 | `/var/lib/mysql` (mariadb) | named volume `mariadb` | Docker-managed by default (see note below) | Database files |
-| `/var/www/html` (wordpress) | bind mount | `src/data/jmondela/wordpress` | WordPress core, themes, plugins, uploads |
-| `/var/www/html` (nginx) | bind mount | `src/data/jmondela/wordpress` (same as above) | Nginx reads/serves the same files WordPress writes |
-| `/var/log/nginx` (nginx) | bind mount | `src/data/jmondela/ngnix/logs` | Access/error logs |
+| `/var/www/html` (wordpress) | bind mount | `srcs/data/jmondela/wordpress` | WordPress core, themes, plugins, uploads |
+| `/var/www/html` (nginx) | bind mount | `srcs/data/jmondela/wordpress` (same as above) | Nginx reads/serves the same files WordPress writes |
+| `/var/log/nginx` (nginx) | bind mount | `srcs/data/jmondela/ngnix/logs` | Access/error logs |
 
 Key implications:
 
-- **WordPress and Nginx share the same bind-mounted directory** (`src/data/jmondela/wordpress`)
+- **WordPress and Nginx share the same bind-mounted directory** (`srcs/data/jmondela/wordpress`)
   so Nginx can serve static assets and hand `.php` requests off to PHP-FPM
   (`wordpress:9000`) via `fastcgi_pass`, without needing its own copy of the files.
 - The `Makefile`'s `create-volumes` target pre-creates `${HOME}/data/jmondela/mariadb` on the
@@ -235,8 +235,8 @@ Key implications:
 - **To fully reset state** (e.g. testing setup from scratch), use `make fclean` (see
   §4) or manually:
   ```bash
-  docker-compose -f src/docker-compose.yml down -v
-  sudo rm -rf ${HOME}/data/jmondela/mariadb src/data/jmondela/wordpress
+  docker-compose -f srcs/docker-compose.yml down -v
+  sudo rm -rf ${HOME}/data/jmondela/mariadb srcs/data/jmondela/wordpress
   make up
   ```
 - Nginx's self-signed TLS certificate (`/etc/ssl/certs/nginx_certificate.crt`) is

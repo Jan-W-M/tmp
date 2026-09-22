@@ -34,7 +34,7 @@ self-signed certificate).
 Check that all three containers are up and healthy:
 
 ```bash
-docker-compose -f src/docker-compose.yml ps
+docker-compose -f srcs/docker-compose.yml ps
 ```
 
 You should see `mariadb`, `wordpress`, and `nginx` listed as `running`.
@@ -135,15 +135,15 @@ Typical variables you'll find/manage there:
 
 **Are the containers running?**
 ```bash
-docker-compose -f src/docker-compose.yml ps
+docker-compose -f srcs/docker-compose.yml ps
 ```
 
 **View logs (useful when something isn't loading):**
 ```bash
 make logs
-docker-compose -f src/docker-compose.yml logs -f nginx
-docker-compose -f src/docker-compose.yml logs -f wordpress
-docker-compose -f src/docker-compose.yml logs -f mariadb
+docker-compose -f srcs/docker-compose.yml logs -f nginx
+docker-compose -f srcs/docker-compose.yml logs -f wordpress
+docker-compose -f srcs/docker-compose.yml logs -f mariadb
 ```
 
 **Confirm Nginx is answering:**
