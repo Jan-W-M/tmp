@@ -12,7 +12,7 @@ RUN	mkdir -p /run/mysqld /var/lib/mysql /var/log/mysql/ && \
 RUN	mysql_install_db --user=mysql --datadir=/var/lib/mysql --auth-root-authentication-method=normal --skip-test-db
 
 COPY ./conf/my.cnf /etc/mysql/my.cnf
-CMD chmod 644 /etc/mysql/my.cnf
+RUN chmod 644 /etc/mysql/my.cnf
 
 COPY ./tools/script.sh /usr/local/bin/
 
