@@ -1,4 +1,3 @@
-
 #!/bin/sh
 
 DATABASE_DIR="/var/lib/mysql/${MYSQL_DATABASE}"

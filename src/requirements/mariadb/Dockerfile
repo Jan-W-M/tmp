@@ -21,4 +21,4 @@ EXPOSE 3306
 ENTRYPOINT ["/usr/local/bin/script.sh"]
 
 # Command launched at the end of the setup
-CMD ["/usr/sbin/mariadbd", "--datadir=/var/lib/mysql"]
+CMD ["/usr/sbin/mariadbd", "--datadir=/var/lib/mysql", "--user=mysql"]
