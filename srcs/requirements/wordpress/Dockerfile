@@ -28,6 +28,6 @@ COPY ./tools/script.sh /usr/local/bin/
 
 EXPOSE 9000
 
-ENTRYPOINT [./tools/script.sh]
+ENTRYPOINT ["/usr/local/bin/script.sh"]
 
 CMD ["php-fpm8.2", "-F"]
