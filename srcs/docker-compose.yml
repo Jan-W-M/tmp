@@ -11,12 +11,20 @@ services:
     networks:
       - inception
     restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+
 
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     env_file: .env
     #ports:
     #  - "9000:9000"
