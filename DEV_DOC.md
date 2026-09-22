@@ -21,11 +21,11 @@ everything it references (build contexts, `.env`) live under a `src/` subfolder:
     └── requirements/
         ├── mariadb/
         │   ├── Dockerfile
-        │   ├── conf/maria.conf
+        │   ├── conf/my.cnf
         │   └── tools/script.sh
         ├── wordpress/
         │   ├── Dockerfile
-        │   ├── conf/www.conf
+        │   ├── conf/www.conf     
         │   └── tools/script.sh
         └── nginx/
             ├── Dockerfile
