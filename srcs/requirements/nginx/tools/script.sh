@@ -3,7 +3,7 @@
 USERNAME=${USERNAME:-jmondela}
 
 if [ -f "/etc/nginx/conf.d/nginx.conf" ]; then
-    sed -i "s/jmondela\.42\.fr/$(USERNAME)\.42\.fr/g" /etc/nginx/conf.d/nginx.conf
+    sed -i 's/jmondela\.42\.fr/$(USERNAME)\.42\.fr/g' /etc/nginx/conf.d/nginx.conf
 fi
 
 if [ ! -f "/etc/ssl/certs/nginx_certificate.crt" ]; then

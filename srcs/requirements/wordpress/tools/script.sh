@@ -10,7 +10,7 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 		sleep 2
 	done
 
-	USERID=${USER:-jmondela}
+	USERNAME=${USER:-jmondela}
 	wp config create	--dbname=${MYSQL_DATABASE} \
 						--dbuser=${MYSQL_USER} \
 						--dbpass=${MYSQL_PASSWORD} \
