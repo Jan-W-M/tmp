@@ -15,7 +15,7 @@ RUN	apt-get update -y && \
 	php8.2-imap
 
 RUN mkdir -p /run/php
-RUN	mkdir -p /var/www/html 
+RUN	mkdir -p /var/www/html
 RUN chown -R www-data:www-data /var/www/html/
 
 RUN	curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
@@ -28,6 +28,6 @@ COPY ./tools/script.sh /usr/local/bin/
 
 EXPOSE 9000
 
-ENTRYPOINT ["script.sh"]
+ENTRYPOINT [./tools/script.sh]
 
 CMD ["php-fpm8.2", "-F"]

@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 
-RUN	apt-get update -y && apt-get install -y nginx openssl php-fpm
+RUN	apt-get update -y && apt-get install -y nginx openssl
 
 RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
 

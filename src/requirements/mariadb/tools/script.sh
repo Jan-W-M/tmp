@@ -3,8 +3,6 @@
 DATABASE_DIR="/var/lib/mysql/${MYSQL_DATABASE}"
 
 if [ ! -d "$DATABASE_DIR" ]; then
-    # Temporary bootstrap instance, not PID 1 yet (script.sh still is) —
-    # fine to use mysqld_safe here since it's not the long-running process.
     /usr/bin/mysqld_safe --datadir=/var/lib/mysql &
 
     until mysqladmin ping 2> /dev/null; do
@@ -30,18 +28,10 @@ EOF
         exit 1
     fi
 
-    # Clean shutdown of the bootstrap instance, now authenticated with the
-    # new root password. Waits for mysqld_safe's child to actually exit
-    # before continuing, so we don't exec the real server into a socket
-    # that's still in use.
     mysqladmin -u root -p"${MYSQL_ROOT_PASSWORD}" shutdown
 
     while mysqladmin ping 2> /dev/null; do
         sleep 1
     done
 fi
-
-# Real, long-running server: becomes PID 1 via exec, so it receives
-# SIGTERM directly from Docker and shuts down cleanly (no mysqld_safe
-# wrapper in the way).
 exec "$@"
