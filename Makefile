@@ -26,8 +26,8 @@ clean: down
 
 fclean: clean
 	sudo rm -rf $(DB_VOLUME) $(WP_VOLUME)
-	docker volume rm srcs_$(DB_DOCKER_VOLUME) srcs_$(WP_DOCKER_VOLUME) --force
-	docker image rm srcs_$(DB_DOCKER_VOLUME) debian:bookworm-slim srcs_$(WP_DOCKER_VOLUME) srcss_nginx --force
+	-docker volume rm $(DB_DOCKER_VOLUME) $(WP_DOCKER_VOLUME) --force
+	-docker image rm srcs-$(DB_DOCKER_VOLUME) srcs-$(WP_DOCKER_VOLUME) srcs-nginx debian:bookworm-slim --force
 
 re: fclean all
 

@@ -14,8 +14,8 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 	wp config create	--dbname=${MYSQL_DATABASE} \
 						--dbuser=${MYSQL_USER} \
 						--dbpass=${MYSQL_PASSWORD} \
+						--dbhost=mariadb \
 						--allow-root
-						#--dbhost=mariadb:3306 \
 
 	wp core install		--url=https://${USERNAME}.42.fr \
 						--title=${WP_TITLE} \
@@ -39,3 +39,6 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 fi;
 
 exec "$@"
+
+
+#--dbhost=mariadb:3306 \
