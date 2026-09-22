@@ -2,8 +2,8 @@ USERNAME ?= jmondela
 COMPOSE_FILE = src/docker-compose.yml
 DB_DOCKER_VOLUME = mariadb
 WP_DOCKER_VOLUME = wordpress
-DB_VOLUME = ${HOME}/data/${DB_DOCKER_VOLUME}
-WP_VOLUME = ${HOME}/data/${WP_DOCKER_VOLUME}
+DB_VOLUME = ${HOME}/data/jmondela${DB_DOCKER_VOLUME}
+WP_VOLUME = ${HOME}/data/jmondela${WP_DOCKER_VOLUME}
 
 .PHONY: all up down stop logs clean fclean re create-volumes update-hosts
 

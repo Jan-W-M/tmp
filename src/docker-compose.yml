@@ -4,13 +4,13 @@ services:
     build: ./requirements/mariadb
     container_name: mariadb
     env_file: .env
-    ports:
-      - "3306:3306"
+    #ports:
+    #  - "3306:3306"
     volumes:
       - mariadb:/var/lib/mysql
     networks:
       - inception
-    restart: on-failure
+    restart: always
 
   wordpress:
     build: ./requirements/wordpress
@@ -18,13 +18,13 @@ services:
     depends_on:
       - mariadb
     env_file: .env
-    ports:
-      - "9000:9000"
+    #ports:
+    #  - "9000:9000"
     volumes:
       - wordpress:/var/www/html
     networks:
       - inception
-    restart: on-failure
+    restart: always
 
   nginx:
     build: ./requirements/nginx
@@ -39,8 +39,7 @@ services:
       #- ./data/ngnix/logs:/var/log/nginx
     networks:
       - inception
-    restart: on-failure
-
+    restart: always
 networks:
   inception:
     # driver: bridge
@@ -51,12 +50,12 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: ${HOME}/data/mariadb
+      device: ${HOME}/data/jmondela/mariadb
       o: bind
   wordpress:
     name: wordpress
     driver: local
     driver_opts:
       type: none
-      device: ${HOME}/data/wordpress
+      device: ${HOME}/data/jmondela/wordpress
       o: bind
