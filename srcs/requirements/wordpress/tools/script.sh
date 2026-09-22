@@ -6,7 +6,7 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 
 	wp core download --allow-root
 
-	until mysqladmin --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --host=mariadb ping; do
+	until mysqladmin --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} --host=mariadb ping; do #--port=3306
 		sleep 2
 	done
 
@@ -14,8 +14,8 @@ if [ ! -f "/var/www/html/wp-config.php" ]; then
 	wp config create	--dbname=${MYSQL_DATABASE} \
 						--dbuser=${MYSQL_USER} \
 						--dbpass=${MYSQL_PASSWORD} \
-						--dbhost=mariadb \
 						--allow-root
+						#--dbhost=mariadb:3306 \
 
 	wp core install		--url=https://${USERNAME}.42.fr \
 						--title=${WP_TITLE} \
