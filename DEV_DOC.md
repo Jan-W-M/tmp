@@ -44,7 +44,7 @@ are no pre-built DB/CMS/webserver images used, everything is built from the
 > these two need to agree with your real folder name (`src/` or `srcs/`) or `up`/
 > `fclean` will be looking in different places.
 
-> Note: the bind mount path is `./data/jmondelangnix/logs` (typo for "nginx" carried over
+> Note: the bind mount path is `./data/jmondela/ngnix/logs` (typo for "nginx" carried over
 > from the compose file) — keep this in mind if you're creating the directory
 > manually or scripting setup.
 
@@ -108,7 +108,7 @@ are no pre-built DB/CMS/webserver images used, everything is built from the
    ```
 
    This runs, in order:
-   - `create-volumes` — creates `${HOME}/data/jmondelamariadb` and `src/data/jmondelawordpress` on
+   - `create-volumes` — creates `${HOME}/data/jmondela/mariadb` and `src/data/jmondela/wordpress` on
      the host so bind mounts have somewhere to land.
    - `update-hosts` — adds `127.0.0.1  <USERNAME>.42.fr` to `/etc/hosts` if it isn't
      already there (prompts for `sudo`).
@@ -137,7 +137,7 @@ calling `docker-compose` by hand for anything routine:
 | `make clean` | Runs `down`, then `docker container prune --force` (removes any other stopped containers on the host, not just this project's). |
 | `make fclean` | Runs `clean`, then **destroys persisted data**: `sudo rm -rf` on the MariaDB and WordPress host directories, `docker volume rm` on the named volumes, and `docker image rm` on all three built images plus the shared `debian:bookworm-slim` base. Use this for a genuinely clean slate. |
 | `make re` | `fclean` followed by `all` — full rebuild from nothing. |
-| `make create-volumes` | (internal, called by `up`) creates `${HOME}/data/jmondelamariadb` and `src/data/jmondelawordpress` on the host. |
+| `make create-volumes` | (internal, called by `up`) creates `${HOME}/data/jmondela/mariadb` and `src/data/jmondela/wordpress` on the host. |
 | `make update-hosts` | (internal, called by `up`) appends `127.0.0.1  <USERNAME>.42.fr` to `/etc/hosts` if missing. |
 
 `USERNAME` can be overridden on any invocation, e.g. `make up USERNAME=jdoe`.
@@ -193,7 +193,7 @@ and rebuilt the image):
 docker-compose -f src/docker-compose.yml up -d --no-deps --build nginx
 ```
 
-**Full teardown including volumes** (drops the database — bind-mounted `./data/jmondela...`
+**Full teardown including volumes** (drops the database — bind-mounted `./data/jmondela/...`
 content is untouched unless you delete it yourself, which is what `make fclean`'s
 `sudo rm -rf` step is for):
 ```bash
@@ -208,21 +208,21 @@ Persistence is split between a named Docker volume and host bind mounts, declare
 | Path in container | Type | Host location | Contains |
 |---|---|---|---|
 | `/var/lib/mysql` (mariadb) | named volume `mariadb` | Docker-managed by default (see note below) | Database files |
-| `/var/www/html` (wordpress) | bind mount | `src/data/jmondelawordpress` | WordPress core, themes, plugins, uploads |
-| `/var/www/html` (nginx) | bind mount | `src/data/jmondelawordpress` (same as above) | Nginx reads/serves the same files WordPress writes |
-| `/var/log/nginx` (nginx) | bind mount | `src/data/jmondelangnix/logs` | Access/error logs |
+| `/var/www/html` (wordpress) | bind mount | `src/data/jmondela/wordpress` | WordPress core, themes, plugins, uploads |
+| `/var/www/html` (nginx) | bind mount | `src/data/jmondela/wordpress` (same as above) | Nginx reads/serves the same files WordPress writes |
+| `/var/log/nginx` (nginx) | bind mount | `src/data/jmondela/ngnix/logs` | Access/error logs |
 
 Key implications:
 
-- **WordPress and Nginx share the same bind-mounted directory** (`src/data/jmondelawordpress`)
+- **WordPress and Nginx share the same bind-mounted directory** (`src/data/jmondela/wordpress`)
   so Nginx can serve static assets and hand `.php` requests off to PHP-FPM
   (`wordpress:9000`) via `fastcgi_pass`, without needing its own copy of the files.
-- The `Makefile`'s `create-volumes` target pre-creates `${HOME}/data/jmondelamariadb` on the
+- The `Makefile`'s `create-volumes` target pre-creates `${HOME}/data/jmondela/mariadb` on the
   host, which lines up with the **commented-out** `driver_opts` block in
   `docker-compose.yml` that would bind the `mariadb` volume to that exact path. As
   shipped, that block is commented out, so the `mariadb` volume is currently a
   standard Docker-managed volume (its data actually lives under Docker's own storage,
-  not `${HOME}/data/jmondelamariadb`) — the host directory the `Makefile` creates is unused
+  not `${HOME}/data/jmondela/mariadb`) — the host directory the `Makefile` creates is unused
   until you uncomment that block. If you want the DB to persist somewhere host-visible
   (e.g. for backups), uncomment `driver_opts` in `docker-compose.yml` to match what
   `create-volumes` already prepares.
@@ -236,7 +236,7 @@ Key implications:
   §4) or manually:
   ```bash
   docker-compose -f src/docker-compose.yml down -v
-  sudo rm -rf ${HOME}/data/jmondelamariadb src/data/jmondelawordpress
+  sudo rm -rf ${HOME}/data/jmondela/mariadb src/data/jmondela/wordpress
   make up
   ```
 - Nginx's self-signed TLS certificate (`/etc/ssl/certs/nginx_certificate.crt`) is
